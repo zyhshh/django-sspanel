@@ -16,7 +16,7 @@ services:
       - ./configs/nginx/:/etc/nginx/conf.d
       - .:/usr/src/app
     ports:
-      - 80:80
+      - 20000:80
     depends_on:
       - web
     networks:
@@ -25,9 +25,8 @@ services:
     image: mysql:5.6
     container_name : mysql
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: yourpass
-      MYSQL_DATABASE: sspanel
+    env_file:
+      - .envs/.production/.mysql
     volumes:
       - ./configs/mysqld/mysqld_charset.cnf:/etc/mysql/conf.d/mysqld_charset.cnf
       - mysql_data:/var/lib/mysql
@@ -38,10 +37,8 @@ services:
     restart: always
     build: .
     image: sspanel
-    environment:
-      MYSQL_PASSWORD: yourpass
-      MYSQL_HOST: mysql
-      DJANGO_ENV: production
+    env_file:
+      - .envs/.production/.django
     volumes:
       - .:/usr/src/app
     depends_on:

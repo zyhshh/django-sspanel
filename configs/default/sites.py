@@ -1,8 +1,10 @@
+import os
+
 # 网站域名设置（请正确填写，不然订阅功能会失效：
-HOST = "http://127.0.0.1:8000"
+HOST = "http://118.24.109.106:20000"
 
 # 网站密钥
-SECRET_KEY = "aasdasdas"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # 是否开启注册
 ALLOW_REGISTER = True
@@ -12,12 +14,12 @@ ALLOW_REGISTER = True
 DEFAULT_THEME = "default"
 
 # 域名设置
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["118.24.109.106", "127.0.0.1", "localhost"]
 
 # SS面板设置：
 MB = 1024 * 1024
 GB = 1024 * 1024 * 1024
-DEFAULT_TRAFFIC = 5 * GB
+DEFAULT_TRAFFIC = 30 * GB
 START_PORT = 1024
 
 # 默认加密混淆协议
@@ -37,23 +39,22 @@ ALIPAY_TRADE_INFO = "谜之屋的{}元充值码"
 ALIPAY_CALLBACK_URL = f"{HOST}/api/callback/alipay"
 
 # 网站title
-TITLE = "谜之屋"
-SUBTITLE = "秘密的小屋test"
+TITLE = "Complex Lab"
+SUBTITLE = "Complex Lab Internet Bridge"
 
 # 用户邀请返利比例
 INVITE_PERCENT = 0.2
 # 用户能生成的邀请码数量
-INVITE_NUM = 5
+INVITE_NUM = 0
 
 # 网站邀请界面提示语
-INVITEINFO = "邀请码实时更新，如果用完了请关注公众号findyourownway获取"
-
+INVITEINFO = "邀请码实时更新，如果用完了请联系网站管理员获取"
 
 # 部分API接口TOKEN
-TOKEN = "youowntoken"
+TOKEN = os.environ.get("TOKEN")
 
 # 是否开启用户到期邮件通知
-EXPIRE_EMAIL_NOTICE = False
+EXPIRE_EMAIL_NOTICE = True
 
 # SHORT_URL_ALPHABET 请随机生成,且不要重复
 DEFAULT_ALPHABET = "qwertyuiopasdfghjklzxcvbnm"

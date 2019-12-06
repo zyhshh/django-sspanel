@@ -15,7 +15,7 @@ services:
       - ./configs/nginx/:/etc/nginx/conf.d
       - .:/usr/src/app
     ports:
-      - 20000:80
+      - 80:80
     depends_on:
       - web
     networks:

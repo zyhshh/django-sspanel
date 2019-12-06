@@ -111,5 +111,5 @@ static/admin/
 static/jet/
 static/range_filter/
 *.log
-
 .production
+go.mod

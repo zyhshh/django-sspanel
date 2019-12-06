@@ -44,7 +44,6 @@ class UserSSConfigAdmin(admin.ModelAdmin):
         "port",
         "password",
         "method",
-        "speed_limit",
         "human_used_traffic",
         "human_total_traffic",
         "enable",
@@ -76,11 +75,24 @@ class UserTrafficAdmin(admin.ModelAdmin):
     search_fields = ["user_id", "last_use_time"]
 
 
-class SSNodeOnlineLogAdmin(admin.ModelAdmin):
-    list_display = ["node_id", "online_user_count", "created_at"]
+class NodeOnlineLogAdmin(admin.ModelAdmin):
+    list_display = ["node_id", "node_type", "online_user_count", "created_at"]
+    search_fields = ["node_id", "node_type"]
 
 
 class SSNodeAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "node_id",
+        "level",
+        "server",
+        "human_used_traffic",
+        "human_total_traffic",
+        "enable",
+    ]
+
+
+class VmessNodeAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "node_id",
@@ -125,8 +137,9 @@ admin.site.register(models.UserSSConfig, UserSSConfigAdmin)
 admin.site.register(models.UserCheckInLog, UserCheckInAdmin)
 admin.site.register(models.UserRefLog, UserRefLogAdmin)
 admin.site.register(models.UserTraffic, UserTrafficAdmin)
-admin.site.register(models.SSNodeOnlineLog, SSNodeOnlineLogAdmin)
+admin.site.register(models.NodeOnlineLog, NodeOnlineLogAdmin)
 admin.site.register(models.SSNode, SSNodeAdmin)
+admin.site.register(models.VmessNode, VmessNodeAdmin)
 
 admin.site.register(models.InviteCode, InviteCodeAdmin)
 admin.site.register(models.Donate, DonateAdmin)

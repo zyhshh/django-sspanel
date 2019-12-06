@@ -21,8 +21,8 @@ from apps.sspanel.models import (
     Ticket,
     User,
     SSNode,
+    VmessNode,
 )
-from apps.ssserver.models import Node
 from apps.utils import traffic_format
 
 
@@ -114,6 +114,7 @@ class UserInfoView(View):
             "sub_link": user.sub_link,
             "sub_types": User.SUB_TYPES,
             "user_sub_type": user.get_sub_type_display(),
+            "methods": [m[0] for m in METHOD_CHOICES],
         }
         return render(request, "sspanel/userinfo.html", context=context)
 
@@ -123,35 +124,36 @@ class NodeInfoView(View):
     def get(self, request):
         user = request.user
         user_ss_config = user.user_ss_config
-        node_list = [
+        # ss node
+        ss_node_list = [
             node.to_dict_with_extra_info(user_ss_config)
             for node in SSNode.get_active_nodes()
         ]
 
-        # TODO 去掉 SSR节点的兼容
-        ss_user = request.user.ss_user
-        if ss_user:
-            ssr_node_list = [
-                node.to_dict_with_extra_info(ss_user)
-                for node in Node.get_active_nodes()
-            ]
-        else:
-            ssr_node_list = []
+        # vmess node
+        vmess_node_list = [
+            node.to_dict_with_extra_info(user) for node in VmessNode.get_active_nodes()
+        ]
+
         context = {
-            "node_list": node_list,
-            "ssr_node_list": ssr_node_list,
+            "ss_node_list": ss_node_list,
+            "vmess_node_list": vmess_node_list,
             "user": user,
             "sub_link": user.sub_link,
         }
-
         return render(request, "sspanel/nodeinfo.html", context=context)
 
 
 class UserTrafficLog(View):
     @method_decorator(login_required)
     def get(self, request):
-        node_list = SSNode.get_active_nodes()
-        context = {"user": request.user, "node_list": node_list}
+        ss_node_list = SSNode.get_active_nodes()
+        vmess_node_list = VmessNode.get_active_nodes()
+        context = {
+            "user": request.user,
+            "ss_node_list": ss_node_list,
+            "vmess_node_list": vmess_node_list,
+        }
         return render(request, "sspanel/user_traffic_log.html", context=context)
 
 
@@ -165,14 +167,6 @@ class UserSSNodeConfigView(View):
             for node in SSNode.get_user_active_nodes(user)
         ]
         return JsonResponse({"configs": configs})
-
-
-class UserSettingView(View):
-    @method_decorator(login_required)
-    def get(self, request):
-        methods = [m[0] for m in METHOD_CHOICES]
-        context = {"user_ss_config": request.user.user_ss_config, "methods": methods}
-        return render(request, "sspanel/user_settings.html", context=context)
 
 
 class ShopView(View):

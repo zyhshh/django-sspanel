@@ -10,7 +10,13 @@ from django.views import View
 
 from apps.custom_views import PageListView
 from apps.mixin import StaffRequiredMixin
-from apps.sspanel.forms import AnnoForm, GoodsForm, SSNodeForm, UserSSConfigForm
+from apps.sspanel.forms import (
+    AnnoForm,
+    GoodsForm,
+    SSNodeForm,
+    VmessNodeForm,
+    UserSSConfigForm,
+)
 from apps.sspanel.models import (
     Announcement,
     Donate,
@@ -19,7 +25,8 @@ from apps.sspanel.models import (
     MoneyCode,
     PurchaseHistory,
     SSNode,
-    SSNodeOnlineLog,
+    VmessNode,
+    NodeOnlineLog,
     Ticket,
     User,
     UserOnLineIpLog,
@@ -29,6 +36,78 @@ from apps.sspanel.models import (
 )
 
 
+class NodeListView(StaffRequiredMixin, View):
+    def get(self, request):
+        context = {
+            "node_list": list(SSNode.objects.all()) + list(VmessNode.objects.all())
+        }
+        return render(request, "backend/node_list.html", context=context)
+
+
+class NodeView(StaffRequiredMixin, View):
+    def get(self, request, node_type):
+        if node_type == "vmess":
+            form = VmessNodeForm()
+        elif node_type == "ss":
+            form = SSNodeForm()
+        return render(request, "backend/node_detail.html", context={"form": form})
+
+    def post(self, request, node_type):
+        if node_type == "vmess":
+            form = VmessNodeForm(request.POST)
+        elif node_type == "ss":
+            form = SSNodeForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "数据更新成功！", extra_tags="添加成功")
+            return HttpResponseRedirect(reverse("sspanel:backend_node_list"))
+        else:
+            messages.error(request, "数据填写错误", extra_tags="错误")
+            context = {"form": form}
+            return render(request, "backend/node_detail.html", context=context)
+
+
+class NodeDetailView(StaffRequiredMixin, View):
+    def get(self, request, node_type, node_id):
+        if node_type == "vmess":
+            vmess_node = VmessNode.objects.get(node_id=node_id)
+            form = VmessNodeForm(instance=vmess_node)
+        elif node_type == "ss":
+            ss_node = SSNode.objects.get(node_id=node_id)
+            form = SSNodeForm(instance=ss_node)
+
+        return render(request, "backend/node_detail.html", context={"form": form})
+
+    def post(self, request, node_type, node_id):
+        if node_type == "vmess":
+            node = VmessNode.objects.get(node_id=node_id)
+            form = VmessNodeForm(request.POST, instance=node)
+        elif node_type == "ss":
+            node = SSNode.objects.get(node_id=node_id)
+            form = SSNodeForm(request.POST, instance=node)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, "数据更新成功", extra_tags="修改成功")
+            return HttpResponseRedirect(reverse("sspanel:backend_node_list"))
+        else:
+            messages.error(request, "数据填写错误", extra_tags="错误")
+            return render(request, "backend/node_detail.html", context={"form": form})
+
+
+class NodeDeleteView(StaffRequiredMixin, View):
+    def get(self, request, node_type, node_id):
+        if node_type == "vmess":
+            vmess_node = VmessNode.objects.get(node_id=node_id)
+            vmess_node.delete()
+        elif node_type == "ss":
+            ss_node = SSNode.objects.get(node_id=node_id)
+            ss_node.delete()
+        messages.success(request, "成功啦", extra_tags="删除节点")
+        return HttpResponseRedirect(reverse("sspanel:backend_node_list"))
+
+
 class UserOnlineIpLogView(StaffRequiredMixin, View):
     def get(self, request):
         data = []
@@ -36,56 +115,6 @@ class UserOnlineIpLogView(StaffRequiredMixin, View):
             data.extend(UserOnLineIpLog.get_recent_log_by_node_id(node.node_id))
         context = PageListView(request, data).get_page_context()
         return render(request, "backend/user_online_ip_log.html", context=context)
-
-
-class SSNodeView(StaffRequiredMixin, View):
-    def get(self, request):
-        form = SSNodeForm()
-        return render(request, "backend/ss_node_detail.html", context={"form": form})
-
-    def post(self, request):
-        form = SSNodeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "数据更新成功！", extra_tags="添加成功")
-            return HttpResponseRedirect(reverse("sspanel:backend_ss_node_list"))
-        else:
-            messages.error(request, "数据填写错误", extra_tags="错误")
-            context = {"form": form}
-            return render(request, "backend/ss_node_detail.html", context=context)
-
-
-class SSNodeListView(StaffRequiredMixin, View):
-    def get(self, request):
-        context = {"ss_node_list": SSNode.objects.all()}
-        return render(request, "backend/ss_node_list.html", context=context)
-
-
-class SSNodeDetailView(StaffRequiredMixin, View):
-    def get(self, request, node_id):
-        ss_node = SSNode.objects.get(node_id=node_id)
-        form = SSNodeForm(instance=ss_node)
-        return render(request, "backend/ss_node_detail.html", context={"form": form})
-
-    def post(self, request, node_id):
-        ss_node = SSNode.objects.get(node_id=node_id)
-        form = SSNodeForm(request.POST, instance=ss_node)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "数据更新成功", extra_tags="修改成功")
-            return HttpResponseRedirect(reverse("sspanel:backend_ss_node_list"))
-        else:
-            messages.error(request, "数据填写错误", extra_tags="错误")
-            context = {"form": form, "ss_node": ss_node}
-            return render(request, "backend/ss_node_detail.html", context=context)
-
-
-class SSNodeDeleteView(StaffRequiredMixin, View):
-    def get(self, request, node_id):
-        ss_node = SSNode.get_or_none_by_node_id(node_id)
-        node_id and ss_node.delete()
-        messages.success(request, "成功啦", extra_tags="删除节点")
-        return HttpResponseRedirect(reverse("sspanel:backend_ss_node_list"))
 
 
 class UserSSConfigListView(StaffRequiredMixin, View):
@@ -150,7 +179,7 @@ class UserStatusView(StaffRequiredMixin, View):
 
         context = {
             "total_user_num": User.get_total_user_num(),
-            "alive_user_count": SSNodeOnlineLog.get_all_node_online_user_count(),
+            "alive_user_count": NodeOnlineLog.get_all_node_online_user_count(),
             "today_checked_user_count": UserCheckInLog.get_today_checkin_user_count(),
             "today_register_user_count": len(today_register_user),
             "traffic_users": UserTraffic.get_user_order_by_traffic(count=10),

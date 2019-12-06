@@ -11,4 +11,4 @@ ANYMAIL = {
     "SENDGRID_API_KEY": os.environ.get("SENDGRID_API_KEY"),
 }
 EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
-DEFAULT_FROM_EMAIL = "admin@complexlab.com"
+DEFAULT_FROM_EMAIL = "vpn@sspannel.com"

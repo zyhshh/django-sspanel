@@ -1,7 +1,7 @@
 import os
 
 # 网站域名设置（请正确填写，不然订阅功能会失效：
-HOST = "http://118.24.109.106:20000"
+HOST = "http://vpn.coinsmart365.com"
 
 # 网站密钥
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -14,12 +14,12 @@ ALLOW_REGISTER = True
 DEFAULT_THEME = "default"
 
 # 域名设置
-ALLOWED_HOSTS = ["118.24.109.106", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = [".coinsmart365.com", "127.0.0.1", "localhost"]
 
 # SS面板设置：
 MB = 1024 * 1024
 GB = 1024 * 1024 * 1024
-DEFAULT_TRAFFIC = 30 * GB
+DEFAULT_TRAFFIC = 500 * GB
 START_PORT = 1024
 
 # 默认加密混淆协议
@@ -37,8 +37,8 @@ ALIPAY_TRADE_INFO = "谜之屋的{}元充值码"
 ALIPAY_CALLBACK_URL = f"{HOST}/api/callback/alipay"
 
 # 网站title
-TITLE = "Complex Lab"
-SUBTITLE = "Complex Lab Internet Bridge"
+TITLE = "迷之屋"
+SUBTITLE = "Your Internet Bridge"
 
 # 用户邀请返利比例
 INVITE_PERCENT = 0.2

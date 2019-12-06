@@ -3,7 +3,7 @@ DATABASES = {
     "default": {
         "ENGINE": "django_prometheus.db.backends.mysql",
         "NAME": "sspanel",
-        "USER": "complexlab",
+        "USER": "sspanel",
         "PASSWORD": "",
         "HOST": "127.0.0.1",
         "PORT": "3306",
